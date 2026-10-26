@@ -489,10 +489,6 @@ def show_revenue(revenue, monthly: pd.DataFrame) -> None:
         "Deckungsbeitrag in Prozent des Erlöses. Feste Kosten wie Miete oder Personal sind nicht enthalten."
     )
 
-    st.subheader("Erlös pro Monat")
-    st.dataframe(german_table(monthly))
-    csv_download(monthly, "erloese_pro_monat.csv")
-    explain("Jede Zeile zeigt einen Monat: Energie, Erlös, durchschnittlich erzielten Preis und den Anteil erneuerbarer Energie.")
 
 
 
@@ -609,7 +605,16 @@ def plan_variance(ist: pd.DataFrame, previous: pd.DataFrame | None) -> None:
             "Plan Preis [€/MWh]": round(float(base["Ø erzielter Preis [€/MWh]"]), 1),
         })
     plan = st.data_editor(
-        pd.DataFrame(rows), hide_index=True, disabled=["Monat"], key="plan_editor", width="stretch"
+        pd.DataFrame(rows),
+        hide_index=True,
+        disabled=["Monat"],
+        key="plan_editor",
+        width="stretch",
+        column_config={
+            # "localized" zeigt Zahlen in der Schreibweise des Browsers an, bei Deutsch also 9.800
+            "Plan Energie [GWh]": st.column_config.NumberColumn(format="localized"),
+            "Plan Preis [€/MWh]": st.column_config.NumberColumn(format="localized"),
+        },
     ).set_index("Monat").astype(float)
 
     plan_e = plan["Plan Energie [GWh]"]
